@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Змейка</title>
+	<style type="text/css">
+	
+	canvas{
+		display: block;
+		margin:  0 auto;
+		margin-top: 100px;
+	}
+
+	</style>
+	
+</head>
+<body>
+
+
+<canvas id="game" width="608" height="608"></canvas>
+
+
+
+<script type="text/javascript">
+		
+const canvas = document.getElementById("game");
+const cpx = canvas.getContext("2d");
+
+const ground = new Image();
+ground.src = "1.png";
+
+const foodImg = new Image();
+foodImg.src = "2.png";
+
+let box = 32;
+
+let score = 0;
+
+let food = {
+	x: Math.floor(Math.random()*17 +1) * box,
+	y: Math.floor(Math.random()*15 +3) * box,
+};
+
+let snake = [];
+snake[0] ={
+	x: 9*box,
+	y: 10*box,
+};
+
+
+document.addEventListener("keydown", direction);
+
+let der;
+
+function direction(event){
+	if(event.keyCode == 37 && der != "right")
+		der = "left";
+	else if(event.keyCode == 38 && der != "down")
+		der = "up";
+	else if(event.keyCode == 39 && der != "left")
+		der = "right";
+	else if(event.keyCode == 40 && der != "up")
+		der = "down";
+}
+
+function eatTail(head, arr){
+	for(let i = 0; i<arr.length; i++){
+		if(head.x ==arr[i].x && head.y ==arr[i].y)
+			clearInterval(game);
+	}
+}
+function drawingGame(){
+	cpx.drawImage(ground, 0, 0);
+
+	cpx.drawImage(foodImg, food.x, food.y);
+
+	for(let i = 0; i < snake.length; i++){
+		cpx.fillStyle = i == 0?"green" : "red";
+		cpx.fillRect(snake[i].x, snake[i].y, box, box);
+	}
+
+	cpx.fillStyle ="white";
+	cpx.font="40px Arial";
+	cpx.fillText(score, box*2.5, box*1.7);
+
+	let snakeX = snake[0].x;
+	let snakeY = snake[0].y;
+
+
+	if(snakeX == food.x && snakeY == food.y ){
+		score++;
+		food = {
+			x: Math.floor(Math.random()*17 +1) * box,
+			y: Math.floor(Math.random()*15 +3) * box,
+		};
+
+	} else{
+		snake.pop();
+	}
+
+
+	if(snakeX < box || snakeX > box * 17 
+		|| snakeY < 3 * box || snakeY > box * 17)
+		clearInterval(game);
+
+
+	if(der == "left") snakeX -=box;
+	else if(der == "right") snakeX +=box;
+	else if(der == "up") snakeY -=box;
+	else if(der == "down") snakeY +=box;
+
+	let newHead = {
+		x: snakeX,
+		y: snakeY
+	};
+
+	eatTail(newHead, snake)
+	snake.unshift(newHead);
+}
+
+
+let game = setInterval(drawingGame, 122);
+
+</script>
+</body>
+</html>
